@@ -4,7 +4,7 @@ A small rasterizing project made in python with PyOpenGL
 To test this project you will need **python**. This project shoud run both on **Windows** and **Linux**.
 ## Windows
 For windows your goin to need python if you dont have it go to [python.org](https://python.org) and click on **download python**.
-After having downloaded pyhton your going to go to [releases](https://github.com/yoyogojo19/Rasterizing/realeses) and download the **zip file**.
+After having downloaded pyhton your going to go to [releases]([https://github.com/yoyogojo19/Rasterizing/realeses](https://github.com/yoyogojo19/Rasterizing/releases/tag/Beta)) and download the **zip file**.
 After downloading the zip file decompresse it. Then open **Command prompt**(on windows10) or **The Terminal**(on windows11) and enter the main file.
 Then write `run.bat` to run the code.
 ## Linux
