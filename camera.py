@@ -5,6 +5,8 @@ from numpy import *
 campos = vec3(0.0,0.0,-5.0)
 camrotH = 0
 camrotV = 0
+camrotH_rad = radians(camrotH)
+camrotV_rad = radians(camrotV)
 camrot = vec3(sin(camrotH)+campos.x,cos(camrotV)+campos.y,cos(camrotH)+campos.z)
 
 def CamRot(DT): 
@@ -13,38 +15,42 @@ def CamRot(DT):
     global campos
     global camrot
     if keyboard.is_pressed("left"):
-        camrotH += 5 * DT
+        camrotH += 50 * DT
     if keyboard.is_pressed("right"):
-        camrotH -= 5 * DT
+        camrotH -= 50 * DT
     if keyboard.is_pressed("up"):
-        camrotV += 5 * DT
+        camrotV += 50 * DT
     if keyboard.is_pressed("down"):
-        camrotV -= 5 * DT
-    if camrotV >= 90:
-        camrotV = 90
-    if camrotV <= -90:
-        camrotV = -90
-    camrot.x = sin(camrotH)+campos.x
-    camrot.y = cos(camrotV)+campos.y
-    camrot.z = cos(camrotH)+campos.z
+        camrotV -= 50 * DT
+
+    camrotV = clip(camrotV, -89, 89)
+    
+    camrotH_rad = radians(camrotH)
+    camrotV_rad = radians(camrotV)
+
+    camrot.x = sin(camrotH_rad) * cos(camrotV_rad) + campos.x
+    camrot.y = sin(camrotV_rad) + campos.y
+    camrot.z = cos(camrotH_rad) * cos(camrotV_rad) + campos.z
 
 def CamMove(DT):
-    global camrotH
-    global camrotV
+    global camrotH_rad, camrotH
+    global camrotV_rad, camrotV
+    camrotH_rad = radians(camrotH)
+    camrotV_rad = radians(camrotV)
     global campos
     global camrot
-    if keyboard.is_pressed("a"):
-        campos.z += 5 * DT * -sin(camrotH)
-        campos.x += 5 * DT * cos(camrotH)
-    if keyboard.is_pressed("d"):
-        campos.z -= 5 * DT * -sin(camrotH)
-        campos.x -= 5 * DT * cos(camrotH)
     if keyboard.is_pressed("w"):
-        campos.z += 5 * DT * cos(camrotH)
-        campos.x += 5 * DT * sin(camrotH)
+        campos.x += 5 * DT * sin(camrotH_rad) * cos(camrotV_rad)
+        campos.z += 5 * DT * cos(camrotH_rad) * cos(camrotV_rad)
     if keyboard.is_pressed("s"):
-        campos.z -= 5 * DT * cos(camrotH)
-        campos.x -= 5 * DT * sin(camrotH)
+        campos.x -= 5 * DT * sin(camrotH_rad) * cos(camrotV_rad)
+        campos.z -= 5 * DT * cos(camrotH_rad) * cos(camrotV_rad)
+    if keyboard.is_pressed("a"):
+        campos.x += 5 * DT * sin(camrotH_rad + pi/2) * cos(camrotV_rad)
+        campos.z += 5 * DT * cos(camrotH_rad + pi/2) * cos(camrotV_rad)
+    if keyboard.is_pressed("d"):
+        campos.x -= 5 * DT * sin(camrotH_rad + pi/2) * cos(camrotV_rad)
+        campos.z -= 5 * DT * cos(camrotH_rad + pi/2) * cos(camrotV_rad)
     if keyboard.is_pressed("space"):
         campos.y += 5 * DT
     if keyboard.is_pressed("shift"):
