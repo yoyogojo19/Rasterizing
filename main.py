@@ -10,39 +10,57 @@ width = 1500
 height = 818
 temps_avant = 0
 DeltaTemps = 0
-names = ["cube.obj","sol.obj","suzane.obj"]
+names = [("test.obj",0,0,0)]
 
 for name in names:
-    obj.load_obj(name)
+    obj.load_obj(name[0],name[1],name[2],name[3])
 
-exec(open("obj_loader.py").read())
+def init_vbo():
+    global vbo, color_vbo
+    vbo = glGenBuffers(1)
+    color_vbo = glGenBuffers(1)
+    vertices = []
+    colors = []
+    random.seed(10)
+    for i in obj.arrettes:
+        A = obj.coins[i.x-1]
+        B = obj.coins[i.y-1]
+        C = obj.coins[i.z-1]
+        color = (random.random(), random.random(), random.random())
+        vertices.extend([A.x, A.y, A.z, B.x, B.y, B.z, C.x, C.y, C.z])
+        colors.extend([color[0], color[1], color[2]] * 3)
 
-def glDrawTriangle(A : vec3, B : vec3, C : vec3, color : vec3):
-    glBegin(GL_TRIANGLES)
-    glColor3f(color.x, color.y, color.z)
-    glVertex3f(A.x, A.y, A.z)
-    glVertex3f(B.x, B.y, B.z)
-    glVertex3f(C.x, C.y, C.z)
-    glEnd()
+    # Envoie les données au GPU
+    glBindBuffer(GL_ARRAY_BUFFER, vbo)
+    glBufferData(GL_ARRAY_BUFFER, len(vertices)*4, (ctypes.c_float * len(vertices))(*vertices), GL_STATIC_DRAW)
+
+    glBindBuffer(GL_ARRAY_BUFFER, color_vbo)
+    glBufferData(GL_ARRAY_BUFFER, len(colors)*4, (ctypes.c_float * len(colors))(*colors), GL_STATIC_DRAW)
 
 def display():
-    global camrot
-    global campos
-    global DeltaTemps
-    global temps_avant
+    global camrot, campos, DeltaTemps, temps_avant, vbo, color_vbo
     DeltaTemps = time.time() - temps_avant
     temps_avant = time.time()
     print(1/DeltaTemps)
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
     gluLookAt(campos.x, campos.y, campos.z, camrot.x, camrot.y, camrot.z, 0, 1, 0)
-    random.seed(10)
-    for i in obj.arrettes:
-        glDrawTriangle(obj.coins[i.x-1],
-                        obj.coins[i.y-1], 
-                        obj.coins[i.z-1],
-                        vec3(random.random(),random.random(),random.random())
-                        )
+
+    glEnableClientState(GL_VERTEX_ARRAY)
+    glEnableClientState(GL_COLOR_ARRAY)
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo)
+    glVertexPointer(3, GL_FLOAT, 0, None)
+
+    glBindBuffer(GL_ARRAY_BUFFER, color_vbo)
+    glColorPointer(3, GL_FLOAT, 0, None)
+
+    glDrawArrays(GL_TRIANGLES, 0, len(obj.arrettes)*3)
+
+    glDisableClientState(GL_VERTEX_ARRAY)
+    glDisableClientState(GL_COLOR_ARRAY)
+
     CamMove(DeltaTemps)
     CamRot(DeltaTemps)
     glutSwapBuffers()
@@ -67,6 +85,7 @@ def main():
     glutInitWindowSize(width, height)
     glutCreateWindow(b"Rasterizer")
     glEnable(GL_DEPTH_TEST)
+    init_vbo()
     glutDisplayFunc(display)
     glutReshapeFunc(redimensionner)
     glutIdleFunc(idle)
