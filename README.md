@@ -10,4 +10,4 @@ Then write `run.bat` to run the code.
 ## Linux
 For Linux your going to open. If you have python installed skip this step otherwise continue, you have to write `sudo apt install python3`.
 then your goining to clone this reposetry by entering `git clone https://github.com/yoyogojo19/Rasterizing` then enter the main file.
-To run the program write `./run.sh`
+To run the program write `bash run.sh`
